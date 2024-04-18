@@ -16,12 +16,14 @@ public class MusicManager : MonoBehaviour
     [SerializeField] private TMPro.TMP_Text listeningTo;
 
     [SerializeField] private Image image;
-    [SerializeField] private Sprite[] images;
+   private Sprite[] sprites;
 
     [SerializeField] private GameObject Maracas;
 
     private int rotationZ;
 
+    private bool shuffled;
+    private int songBeforeShuffle;
     void Start()
     {
         looping.SetActive(false);
@@ -36,9 +38,7 @@ public class MusicManager : MonoBehaviour
 
         audioSource.loop = false;
 
-        audioSource.SetScheduledEndTime(AudioSettings.dspTime + audioSource.clip.length);
-        audioSource.PlayScheduled(AudioSettings.dspTime);
-        audioSource.SetScheduledEndTime(AudioSettings.dspTime + audioSource.clip.length);
+      
 
         LoadAllSongs();
       
@@ -50,7 +50,12 @@ public class MusicManager : MonoBehaviour
         {
             slider.value = audioSource.time;
 
-            rotationZ = Random.Range(-25, 26);
+            if (slider.value >= slider.maxValue )
+            {
+                Next();
+            }
+
+            rotationZ = Random.Range(-5, 6);
             Maracas.transform.Rotate(new Vector3(0, 0, rotationZ), Space.Self);
         }
 
@@ -61,13 +66,18 @@ public class MusicManager : MonoBehaviour
     private void LoadAllSongs()
     {
         songs = Resources.LoadAll<AudioClip>("Songs");
-        // images = Resources.LoadAll<Sprite>("Sprites");
+        sprites = Resources.LoadAll<Sprite>("Images");
+
+        
     }
 
 
 public void Shuffle()
     {
+        shuffled = true;
+        songBeforeShuffle = cancionActual;
         cancionActual = Random.Range(0, songs.Length);
+        while (cancionActual == songBeforeShuffle) { cancionActual = Random.Range(0, songs.Length); }
         audioSource.clip = songs[cancionActual];
         audioSource.Play();
         YouAreListeningTo();
@@ -76,6 +86,7 @@ public void Shuffle()
     public void Resume()
     {
         audioSource.Play();
+        slider.maxValue = audioSource.clip.length;
     }
 
     public void ResetSong()
@@ -87,7 +98,13 @@ public void Shuffle()
 
     public void Next()
     {
+        if (shuffled) { shuffled = false; }
+        
         cancionActual++;
+        if (cancionActual > songs.Length)
+        {
+            cancionActual = 0;
+        }
         audioSource.clip = songs[cancionActual];
         YouAreListeningTo();
         Resume();
@@ -96,13 +113,24 @@ public void Shuffle()
     public void Previous()
     {
         cancionActual--;
-
-        if (cancionActual <= 0)
+        if (shuffled)
         {
-            cancionActual = 0;
+            cancionActual = songBeforeShuffle;
+            audioSource.clip = songs[cancionActual];
+            shuffled = false;
+        }
+        else
+        {
+            if (cancionActual <= 0)
+            {
+                cancionActual = songs.Length - 1;
+            }
+            audioSource.clip = songs[cancionActual];
         }
 
-        audioSource.clip = songs[cancionActual];
+        
+
+        
         YouAreListeningTo();
         Resume();
     }
@@ -124,9 +152,12 @@ public void Shuffle()
     public void YouAreListeningTo()
     {
 
+        
+            listeningTo.text = songs[cancionActual].name;
 
-        listeningTo.text = songs[cancionActual].name;
-       // image.sprite = images[cancionActual];
+            image.sprite = sprites[cancionActual];
+        
+        
     }
 
     
