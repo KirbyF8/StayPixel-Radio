@@ -10,6 +10,8 @@ public class MusicManager : MonoBehaviour
     [SerializeField] AudioSource audioSource;
     [SerializeField] Slider slider;
 
+    [SerializeField] Slider volumeSlider;
+
     private int cancionActual = 0;
 
     [SerializeField] private GameObject looping;
@@ -51,7 +53,7 @@ public class MusicManager : MonoBehaviour
         {
             slider.value = audioSource.time;
 
-            if (slider.value >= slider.maxValue )
+            if (slider.value >= slider.maxValue && looping == false )
             {
                 Next();
             }
@@ -179,6 +181,10 @@ public void Shuffle(bool isFromButton)
         
     }
 
+    public void VolumeChange()
+    {
+        audioSource.volume = volumeSlider.value;
+    }
    
 
 
