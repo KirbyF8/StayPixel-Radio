@@ -19,6 +19,7 @@ public class MusicManager : MonoBehaviour
    private Sprite[] sprites;
 
     [SerializeField] private GameObject Maracas;
+    [SerializeField] private GameObject random;
 
     private int rotationZ;
 
@@ -28,10 +29,10 @@ public class MusicManager : MonoBehaviour
     {
         looping.SetActive(false);
         LoadAllSongs();
-
+        random.SetActive(false);
         YouAreListeningTo();
 
-
+        shuffled = false;
         audioSource.clip = songs[cancionActual];
         slider.maxValue = audioSource.clip.length;
 
@@ -72,15 +73,32 @@ public class MusicManager : MonoBehaviour
     }
 
 
-public void Shuffle()
+public void Shuffle(bool isFromButton)
     {
-        shuffled = true;
+        if (isFromButton) { shuffled = !shuffled; }
+       
         songBeforeShuffle = cancionActual;
-        cancionActual = Random.Range(0, songs.Length);
-        while (cancionActual == songBeforeShuffle) { cancionActual = Random.Range(0, songs.Length); }
-        audioSource.clip = songs[cancionActual];
-        audioSource.Play();
-        YouAreListeningTo();
+
+        if (!shuffled) 
+        { 
+            random.SetActive(false);
+            shuffled = false; 
+        }
+        else 
+        {
+            random.SetActive(true);
+            shuffled = true;
+            cancionActual = Random.Range(0, songs.Length);
+            while (cancionActual == songBeforeShuffle) { cancionActual = Random.Range(0, songs.Length); }
+            audioSource.clip = songs[cancionActual];
+            audioSource.Play();
+            YouAreListeningTo();
+
+        }
+
+        
+       
+       
     }
 
     public void Resume()
@@ -98,7 +116,7 @@ public void Shuffle()
 
     public void Next()
     {
-        if (shuffled) { shuffled = false; }
+        if (shuffled) { Shuffle(false); }
         
         cancionActual++;
         if (cancionActual > songs.Length)
@@ -117,7 +135,8 @@ public void Shuffle()
         {
             cancionActual = songBeforeShuffle;
             audioSource.clip = songs[cancionActual];
-            shuffled = false;
+            songBeforeShuffle = Random.Range(0, songs.Length);
+            while (cancionActual == songBeforeShuffle) { cancionActual = Random.Range(0, songs.Length); }
         }
         else
         {
@@ -160,5 +179,7 @@ public void Shuffle()
         
     }
 
-    
+   
+
+
 }
