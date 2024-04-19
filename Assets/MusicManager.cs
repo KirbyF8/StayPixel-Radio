@@ -33,6 +33,7 @@ public class MusicManager : MonoBehaviour
         LoadAllSongs();
         random.SetActive(false);
         YouAreListeningTo();
+        VolumeChange();
 
         shuffled = false;
         audioSource.clip = songs[cancionActual];
@@ -53,7 +54,7 @@ public class MusicManager : MonoBehaviour
         {
             slider.value = audioSource.time;
 
-            if (slider.value >= slider.maxValue && looping == false )
+            if (slider.value >= (slider.maxValue-1) && looping == false )
             {
                 Next();
             }
@@ -93,6 +94,7 @@ public void Shuffle(bool isFromButton)
             cancionActual = Random.Range(0, songs.Length);
             while (cancionActual == songBeforeShuffle) { cancionActual = Random.Range(0, songs.Length); }
             audioSource.clip = songs[cancionActual];
+            slider.maxValue = audioSource.clip.length;
             audioSource.Play();
             YouAreListeningTo();
 
@@ -126,6 +128,7 @@ public void Shuffle(bool isFromButton)
             cancionActual = 0;
         }
         audioSource.clip = songs[cancionActual];
+     
         YouAreListeningTo();
         Resume();
     }
@@ -136,9 +139,12 @@ public void Shuffle(bool isFromButton)
         if (shuffled)
         {
             cancionActual = songBeforeShuffle;
+      
             audioSource.clip = songs[cancionActual];
             songBeforeShuffle = Random.Range(0, songs.Length);
-            while (cancionActual == songBeforeShuffle) { cancionActual = Random.Range(0, songs.Length); }
+            while (cancionActual == songBeforeShuffle) { cancionActual = Random.Range(0, songs.Length);
+            
+            }
         }
         else
         {
@@ -147,6 +153,7 @@ public void Shuffle(bool isFromButton)
                 cancionActual = songs.Length - 1;
             }
             audioSource.clip = songs[cancionActual];
+            
         }
 
         
@@ -175,8 +182,8 @@ public void Shuffle(bool isFromButton)
 
         
             listeningTo.text = songs[cancionActual].name;
-
-            image.sprite = sprites[cancionActual];
+       
+        image.sprite = sprites[cancionActual];
         
         
     }
